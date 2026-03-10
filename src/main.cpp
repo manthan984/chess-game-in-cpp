@@ -1,24 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
-
-void drawSquare(sf::RenderWindow &window, sf::RectangleShape &square, const float x, const float y, const sf::Color &color, int tempCol, int tempRow, int selectedCol, int selectedRow)
-{
-    square.setPosition(sf::Vector2f(x, y));
-    square.setFillColor(color);
-
-    // Highlight selected
-    if (tempCol == selectedCol && tempRow == selectedRow)
-    {
-        square.setOutlineColor(sf::Color::Red);
-        square.setOutlineThickness(-3.0f);
-    }
-    else
-    {
-        square.setOutlineThickness(0.0f);
-        square.setOutlineColor(sf::Color::Transparent);
-    }
-    window.draw(square);
-}
+#include "Board.h"
 
 int main()
 {
@@ -39,6 +21,9 @@ int main()
     int row, selectedRow = -1;
     int col, selectedCol = -1;
 
+    // Objects
+    Board board(window, square, tileSize, borderOffset);
+    
     while (window.isOpen())
     {
         while (auto event = window.pollEvent())
@@ -85,38 +70,9 @@ int main()
         ChessBoardWindow.setOutlineThickness(10.f);
         window.draw(ChessBoardWindow);
 
-        // drawing shapes;
-
-        // hard coded // bad practice
-
-        // for (int i = 0; i<4; i++){
-        //     for (int j=0; j<4; j++){
-        //         drawSquare(window, square, 200*i+(50.f), 200*j+(50.f));
-        //     }
-        // }
-        // for (int i = 0; i<4; i++){
-        //     for (int j=0; j<4; j++){
-        //         drawSquare(window, square, 100 + 200*i+(50.f), 100 + 200*j+(50.f));
-        //     }
-        // }
-
-        // better logic
-
-        for (int tempRow = 0; tempRow < 8; tempRow++)
-        {
-            for (int tempCol = 0; tempCol < 8; tempCol++)
-            {
-                if ((tempRow + tempCol) % 2 == 0)
-                { // even cell
-                    drawSquare(window, square, borderOffset + tempCol * tileSize, borderOffset + tempRow * tileSize, sf::Color::White, tempCol, tempRow, selectedCol, selectedRow);
-                }
-                else
-                {
-                    drawSquare(window, square, borderOffset + tempCol * tileSize, borderOffset + tempRow * tileSize, sf::Color::Black, tempCol, tempRow, selectedCol, selectedRow);
-                }
-            }
-        }
-
+        // display the board status.
+        board.drawBoard(selectedCol, selectedRow);
+        
         window.display(); // start displaying.
     }
 }
