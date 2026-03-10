@@ -1,4 +1,5 @@
 #pragma once
+#include <SFML/Graphics.hpp>
 
 enum class PieceColor{
     White, 
@@ -19,9 +20,14 @@ protected:
     PieceColor color;
     PieceType type;
 
+    sf::Sprite sprite;
+
 public:
-    Piece(PieceColor color, PieceType type);
+    Piece(PieceColor color, PieceType type, const sf::Texture& texture);
+    virtual ~Piece() = default;
 
     PieceColor getColor() const;
     PieceType getType() const;
+    
+    sf::Sprite& getSprite();
 };

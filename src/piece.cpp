@@ -1,9 +1,8 @@
 #include "Piece.h"
 
-Piece::Piece(PieceColor color, PieceType type)
+
+Piece::Piece(PieceColor color, PieceType type, const sf::Texture& texture) : color(color), type(type), sprite(texture)
 {
-    this->color = color;
-    this->type = type;
 }
 
 PieceColor Piece::getColor() const
@@ -14,4 +13,8 @@ PieceColor Piece::getColor() const
 PieceType Piece::getType() const
 {
     return type;
+}
+
+sf::Sprite& Piece::getSprite() {
+    return sprite;
 }

@@ -7,6 +7,13 @@ int main()
     sf::RenderWindow window(sf::VideoMode({900, 900}), "Chess");
     window.setFramerateLimit(30);
 
+    // Load Textures
+    sf::Texture pieceTexture;
+    if (!pieceTexture.loadFromFile("assets/Chess_Pieces_Sprite.png")){
+        std::cerr << "Failed to load pieces image!!" << std::endl;
+        return -1;
+    }
+
     // shapes
     sf::RectangleShape square(sf::Vector2f(100.f, 100.f));
     sf::RectangleShape ChessBoardWindow(sf::Vector2f(800.f, 800.f));
@@ -16,13 +23,12 @@ int main()
     const float borderOffset = 50.f;
 
     // variables
-    int mouseX;
-    int mouseY;
-    int row, selectedRow = -1;
-    int col, selectedCol = -1;
+
+    int selectedRow = -1;
+    int selectedCol = -1;
 
     // Objects
-    Board board(window, square, tileSize, borderOffset);
+    Board board(window, square, tileSize, borderOffset, pieceTexture);
     
     while (window.isOpen())
     {
@@ -38,15 +44,15 @@ int main()
                 {
                     if (mouseEvent->button == sf::Mouse::Button::Left)
                     {
-                        mouseX = mouseEvent->position.x;
-                        mouseY = mouseEvent->position.y;
+                        int mouseX = mouseEvent->position.x;
+                        int mouseY = mouseEvent->position.y;
                         if (mouseX >= borderOffset &&
                             mouseX < borderOffset + 8 * tileSize &&
                             mouseY >= borderOffset &&
                             mouseY < borderOffset + 8 * tileSize)
                         {
-                            col = (mouseX - borderOffset) / tileSize;
-                            row = (mouseY - borderOffset) / tileSize;
+                            int col = (mouseX - borderOffset) / tileSize;
+                            int row = (mouseY - borderOffset) / tileSize;
                             selectedRow = row;
                             selectedCol = col;
                             std::cout << "Mouse clicked at: " << col << ", " << row << std::endl;
@@ -71,7 +77,7 @@ int main()
         window.draw(ChessBoardWindow);
 
         // display the board status.
-        board.drawBoard(selectedCol, selectedRow);
+        board.drawBoard(window, selectedCol, selectedRow);
         
         window.display(); // start displaying.
     }
