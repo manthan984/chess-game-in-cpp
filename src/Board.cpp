@@ -26,19 +26,26 @@ Board::Board(sf::RenderWindow &window, sf::RectangleShape &square, const float t
             grid[i][j] = nullptr;
 
             // PAWNS
-            if (i == 1) grid[i][j] = new Pawn(PieceColor::Black, PieceTexture);
-            if (i == 6) grid[i][j] = new Pawn(PieceColor::White, PieceTexture);
+            if (i == 1)
+                grid[i][j] = new Pawn(PieceColor::Black, PieceTexture);
+            if (i == 6)
+                grid[i][j] = new Pawn(PieceColor::White, PieceTexture);
 
             // MAIN PIECES (Rows 0 for Black, Row 7 for White)
             if (i == 0 || i == 7)
             {
                 PieceColor color = (i == 0) ? PieceColor::Black : PieceColor::White;
 
-                if (j == 0 || j == 7) grid[i][j] = new Rook(color, PieceTexture);
-                else if (j == 1 || j == 6) grid[i][j] = new Knight(color, PieceTexture);
-                else if (j == 2 || j == 5) grid[i][j] = new Bishop(color, PieceTexture);
-                else if (j == 3) grid[i][j] = new Queen(color, PieceTexture);
-                else if (j == 4) grid[i][j] = new King(color, PieceTexture);
+                if (j == 0 || j == 7)
+                    grid[i][j] = new Rook(color, PieceTexture);
+                else if (j == 1 || j == 6)
+                    grid[i][j] = new Knight(color, PieceTexture);
+                else if (j == 2 || j == 5)
+                    grid[i][j] = new Bishop(color, PieceTexture);
+                else if (j == 3)
+                    grid[i][j] = new Queen(color, PieceTexture);
+                else if (j == 4)
+                    grid[i][j] = new King(color, PieceTexture);
             }
         }
     }
@@ -108,4 +115,30 @@ void Board::drawBoard(sf::RenderWindow &Window, int selectedCol, int selectedRow
             }
         }
     }
+}
+
+// game logic
+// move piece
+Piece *Board::getPiece(int row, int col)
+{
+    if (row >= 0 && row < 8 && col >= 0 && col < 8)
+    {
+        return grid[row][col];
+    }
+    return nullptr;
+}
+
+void Board::movePiece(int startRow, int startCol, int endRow, int endCol)
+{
+    if (startRow == endRow && startCol == endCol)
+        return;
+
+    if (grid[endRow][endCol] != nullptr)
+    {
+        delete grid[endRow][endCol];
+    }
+
+    grid[endRow][endCol] = grid[startRow][startCol];
+
+    grid[startRow][startCol] = nullptr;
 }
