@@ -4,10 +4,11 @@
 
 int main()
 {
+    // renders a 900x900 px window and set the frames to 30.
     sf::RenderWindow window(sf::VideoMode({900, 900}), "Chess");
     window.setFramerateLimit(30);
 
-    // Load Textures
+    // Load Textures, like Sprite or any media.
     sf::Texture pieceTexture;
     if (!pieceTexture.loadFromFile("assets/Chess_Pieces_Sprite.png"))
     {
@@ -15,7 +16,7 @@ int main()
         return -1;
     }
 
-    // shapes
+    // shapes, for making 8x8 grid or the Game Board
     sf::RectangleShape square(sf::Vector2f(100.f, 100.f));
     sf::RectangleShape ChessBoardWindow(sf::Vector2f(800.f, 800.f));
 
@@ -24,7 +25,6 @@ int main()
     const float borderOffset = 50.f;
 
     // variables
-
     int selectedRow = -1;
     int selectedCol = -1;
     int clickState = 0;
@@ -34,19 +34,19 @@ int main()
     Board board(window, square, tileSize, borderOffset, pieceTexture);
 
     // window
-    while (window.isOpen())
+    while (window.isOpen()) // while the game window is open.
     {
-        while (auto event = window.pollEvent())
+        while (auto event = window.pollEvent()) // Event loop, renders 30 frames per seconds. i.e. loop runs 30 times per seconds.
         {
-            if (event->is<sf::Event::Closed>())
+            if (event->is<sf::Event::Closed>()) // close the window
                 window.close();
 
             // mouse button press detection.
             if (event->is<sf::Event::MouseButtonPressed>())
             {
-                if (auto mouseEvent = event->getIf<sf::Event::MouseButtonPressed>())
+                if (auto mouseEvent = event->getIf<sf::Event::MouseButtonPressed>()) 
                 {
-                    if (mouseEvent->button == sf::Mouse::Button::Left)
+                    if (mouseEvent->button == sf::Mouse::Button::Left) // detect left click.
                     {
                         int mouseX = mouseEvent->position.x;
                         int mouseY = mouseEvent->position.y;

@@ -22,9 +22,15 @@ protected:
 
     sf::Sprite sprite;
 
+    // Helper functions for move validation
+    bool checkStraightLine(int startRow, int startCol, int endRow, int endCol, Piece* grid[8][8]);
+    bool checkDiagonalLine(int startRow, int startCol, int endRow, int endCol, Piece* grid[8][8]);
+
 public:
     Piece(PieceColor color, PieceType type, const sf::Texture& texture);
     virtual ~Piece() = default;
+
+    virtual bool isValidMove(int startRow, int startCol, int endRow, int endCol, Piece* grid[8][8]) = 0;
 
     PieceColor getColor() const;
     PieceType getType() const;

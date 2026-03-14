@@ -1,4 +1,6 @@
 #include "Queen.h"
+#include "Rook.h"
+#include "Bishop.h"
 
 Queen::Queen(PieceColor color, const sf::Texture& texture) 
     : Piece(color, PieceType::Queen, texture) 
@@ -16,4 +18,13 @@ Queen::Queen(PieceColor color, const sf::Texture& texture)
     // Scale it to fit the 100x100 tile size
     float scaleFactor = 100.f / W;
     sprite.setScale({scaleFactor, scaleFactor});
+}
+
+bool Queen::isValidMove(int startRow, int startCol, int endRow, int endCol, Piece* grid[8][8]) {
+    // Friendly fire check
+    if (grid[endRow][endCol] != nullptr && grid[endRow][endCol]->getColor() == this->color) return false;
+    
+    // The Queen is valid if either the straight path OR the diagonal path is clear
+    return checkStraightLine(startRow, startCol, endRow, endCol, grid) || 
+           checkDiagonalLine(startRow, startCol, endRow, endCol, grid);
 }

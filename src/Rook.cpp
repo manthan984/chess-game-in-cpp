@@ -17,3 +17,10 @@ Rook::Rook(PieceColor color, const sf::Texture& texture)
     float scaleFactor = 100.f / W;
     sprite.setScale({scaleFactor, scaleFactor});
 }
+
+bool Rook::isValidMove(int startRow, int startCol, int endRow, int endCol, Piece* grid[8][8]) {
+    // Friendly fire check
+    if (grid[endRow][endCol] != nullptr && grid[endRow][endCol]->getColor() == this->color) return false;
+    
+    return checkStraightLine(startRow, startCol, endRow, endCol, grid);
+}

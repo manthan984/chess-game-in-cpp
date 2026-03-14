@@ -1,4 +1,5 @@
 #include "Bishop.h"
+#include <cmath>
 
 Bishop::Bishop(PieceColor color, const sf::Texture& texture) 
     : Piece(color, PieceType::Bishop, texture) 
@@ -16,4 +17,11 @@ Bishop::Bishop(PieceColor color, const sf::Texture& texture)
     // Scale it to fit the 100x100 tile size
     float scaleFactor = 100.f / W;
     sprite.setScale({scaleFactor, scaleFactor});
+}
+
+bool Bishop::isValidMove(int startRow, int startCol, int endRow, int endCol, Piece* grid[8][8]) {
+    // Friendly fire check
+    if (grid[endRow][endCol] != nullptr && grid[endRow][endCol]->getColor() == this->color) return false;
+    
+    return checkDiagonalLine(startRow, startCol, endRow, endCol, grid);
 }

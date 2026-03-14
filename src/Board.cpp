@@ -117,7 +117,7 @@ void Board::drawBoard(sf::RenderWindow &Window, int selectedCol, int selectedRow
     }
 }
 
-// game logic
+// ---- game logic ---- //
 // move piece
 Piece *Board::getPiece(int row, int col)
 {
@@ -128,17 +128,27 @@ Piece *Board::getPiece(int row, int col)
     return nullptr;
 }
 
-void Board::movePiece(int startRow, int startCol, int endRow, int endCol)
+bool Board::movePiece(int startRow, int startCol, int endRow, int endCol)
 {
-    if (startRow == endRow && startCol == endCol)
-        return;
+    if (startRow == endRow && startCol == endCol) return false;
 
-    if (grid[endRow][endCol] != nullptr)
-    {
-        delete grid[endRow][endCol];
+    // Get the piece trying to move
+    Piece* pieceToMove = grid[startRow][startCol];
+    if (pieceToMove == nullptr) return false; // Safety check
+
+    // ASK PERMISSION: Is this legal?
+    if (pieceToMove->isValidMove(startRow, startCol, endRow, endCol, grid)) {
+        
+        // Legal
+        if (grid[endRow][endCol] != nullptr) {
+            delete grid[endRow][endCol];
+        }
+        grid[endRow][endCol] = pieceToMove;
+        grid[startRow][startCol] = nullptr;
+        
+        return true; // Move successful
     }
 
-    grid[endRow][endCol] = grid[startRow][startCol];
-
-    grid[startRow][startCol] = nullptr;
+    // 3. Permission denied
+    return false;
 }

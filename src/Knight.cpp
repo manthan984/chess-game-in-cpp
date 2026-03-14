@@ -17,3 +17,20 @@ Knight::Knight(PieceColor color, const sf::Texture& texture)
     float scaleFactor = 100.f / W;
     sprite.setScale({scaleFactor, scaleFactor});
 }
+
+bool Knight::isValidMove(int startRow, int startCol, int endRow, int endCol, Piece* grid[8][8]) {
+    // get difference between starting and ending position
+    int rowDiff = endRow - startRow;
+    int colDiff = endCol - startCol;
+
+    // we use Pythagorus theorem, (2*2 + 1*1 = 5);
+    if (rowDiff*rowDiff + colDiff*colDiff != 5) return false;
+
+    // check destination square for self OR enemy
+    if (grid[endRow][endCol] != nullptr){
+        if (grid[endRow][endCol]->getColor() == this->color) return false;
+    }
+
+    // else Valid Knight move
+    return true;
+}
