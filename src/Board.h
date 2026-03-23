@@ -16,6 +16,8 @@ private:
     const sf::Texture &PieceTexture;
     Piece *grid[8][8];
 
+    int whiteKingRow, whiteKingCol;
+    int blackKingRow, blackKingCol;
 public:
     // Constructor/ Distructor
     Board(sf::RenderWindow &window, sf::RectangleShape &square, const float tileSize, const float borderOffset, const sf::Texture &texture);
@@ -26,4 +28,6 @@ public:
     void drawBoard(sf::RenderWindow &Window, int selectedCol, int selectedRow);
     Piece *getPiece(int row, int col);
     bool movePiece(int startRow, int startCol, int endRow, int endCol);
+
+    bool isSquareUnderAttack(int targetRow, int targetCol, PieceColor defebderColor);
 };

@@ -31,6 +31,7 @@ int main()
     int sourceRow = -1, sourceCol = -1;
 
     // Objects
+    PieceColor currentTurn = PieceColor::White;
     Board board(window, square, tileSize, borderOffset, pieceTexture);
 
     // window
@@ -63,7 +64,9 @@ int main()
                             if (clickState == 0)
                             {
                                 // STATE 0: Trying to pick up a piece
-                                if (board.getPiece(row, col) != nullptr)
+                                Piece* clickedPiece = board.getPiece(row, col);
+
+                                if (clickedPiece != nullptr && clickedPiece->getColor() == currentTurn)
                                 {
                                     sourceRow = row;
                                     sourceCol = col;
@@ -76,7 +79,13 @@ int main()
                             else if (clickState == 1)
                             {
                                 // STATE 1: Dropping the piece
-                                board.movePiece(sourceRow, sourceCol, row, col);
+                                bool moveSuccessful = board.movePiece(sourceRow, sourceCol, row, col);
+
+                                // Only change the turn if the move was actually legal and successful
+                                if (moveSuccessful) {
+                                    currentTurn = (currentTurn == PieceColor::White) ? PieceColor::Black : PieceColor::White;
+                                    std::cout << "Move successful. Turn changed." << std::endl;
+                                }
 
                                 // Reset everything back to State 0
                                 clickState = 0;
@@ -84,7 +93,6 @@ int main()
                                 sourceCol = -1;
                                 selectedRow = -1; // Remove highlight
                                 selectedCol = -1;
-                                std::cout << "Moved to: " << col << ", " << row << std::endl;
                             }
                         }
                         else

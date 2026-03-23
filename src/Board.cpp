@@ -49,6 +49,12 @@ Board::Board(sf::RenderWindow &window, sf::RectangleShape &square, const float t
             }
         }
     }
+    
+    // Initialize King trackers to their starting squares
+    blackKingRow = 0;
+    blackKingCol = 4;
+    whiteKingRow = 7;
+    whiteKingCol = 4;
 }
 
 // distructor
@@ -132,23 +138,74 @@ bool Board::movePiece(int startRow, int startCol, int endRow, int endCol)
 {
     if (startRow == endRow && startCol == endCol) return false;
 
-    // Get the piece trying to move
     Piece* pieceToMove = grid[startRow][startCol];
-    if (pieceToMove == nullptr) return false; // Safety check
+    if (pieceToMove == nullptr) return false;
 
-    // ASK PERMISSION: Is this legal?
-    if (pieceToMove->isValidMove(startRow, startCol, endRow, endCol, grid)) {
-        
-        // Legal
-        if (grid[endRow][endCol] != nullptr) {
-            delete grid[endRow][endCol];
-        }
-        grid[endRow][endCol] = pieceToMove;
-        grid[startRow][startCol] = nullptr;
-        
-        return true; // Move successful
+    // Basic piece math validation
+    if (!pieceToMove->isValidMove(startRow, startCol, endRow, endCol, grid)) {
+        return false;
     }
 
-    // 3. Permission denied
-    return false;
+    // Remember what is at the destination
+    Piece* targetPiece = grid[endRow][endCol];
+
+    // Temporarily make the move in the array
+    grid[endRow][endCol] = pieceToMove;
+    grid[startRow][startCol] = nullptr;
+
+    // Get the King's position using our fast trackers!
+    int kingRow = (pieceToMove->getColor() == PieceColor::White) ? whiteKingRow : blackKingRow;
+    int kingCol = (pieceToMove->getColor() == PieceColor::White) ? whiteKingCol : blackKingCol;
+
+    // If the piece we are simulating IS the King, we must use its simulated destination!
+    if (pieceToMove->getType() == PieceType::King) {
+        kingRow = endRow;
+        kingCol = endCol;
+    }
+
+    // Use the radar: Is our King in check after making this move?
+    bool inCheck = isSquareUnderAttack(kingRow, kingCol, pieceToMove->getColor());
+
+    // UNDO LOGIC: The move was illegal!
+    if (inCheck) {
+        grid[startRow][startCol] = pieceToMove; // Put our piece back
+        grid[endRow][endCol] = targetPiece;     // Put the enemy piece back
+        return false; // Move failed
+    }
+
+    // MOVE SUCCESSFUL: Permanently update the tracker if the King actually moved
+    if (pieceToMove->getType() == PieceType::King) {
+        if (pieceToMove->getColor() == PieceColor::White) {
+            whiteKingRow = endRow; whiteKingCol = endCol;
+        } else {
+            blackKingRow = endRow; blackKingCol = endCol;
+        }
+    }
+
+    // Finally safe to permanently delete the captured piece
+    if (targetPiece != nullptr) {
+        delete targetPiece;
+    }
+
+    return true; 
+}
+
+bool Board::isSquareUnderAttack(int targetRow, int targetCol, PieceColor defenderColor) {
+    // Scan the entire board
+    for (int row = 0; row < 8; row++) {
+        for (int col = 0; col < 8; col++) {
+            Piece* piece = grid[row][col];
+
+            // If there is a piece here, and it is an ENEMY piece
+            if (piece != nullptr && piece->getColor() != defenderColor) {
+                
+                // check- can this enemy piece legally move to our target square?
+                if (piece->isValidMove(row, col, targetRow, targetCol, grid)) {
+                    return true; // The square is under attack!
+                }
+            }
+        }
+    }
+
+    return false; 
 }
