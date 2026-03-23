@@ -8,13 +8,22 @@ int main()
     sf::RenderWindow window(sf::VideoMode({900, 900}), "Chess");
     window.setFramerateLimit(30);
 
-    // Load Textures, like Sprite or any media.
+    // Load Textures, like Sprite, text or any media.
     sf::Texture pieceTexture;
     if (!pieceTexture.loadFromFile("assets/Chess_Pieces_Sprite.png"))
     {
         std::cerr << "Failed to load pieces image!!" << std::endl;
         return -1;
     }
+    sf::Font font;
+    if (!font.openFromFile("assets/font.ttf")) { // Note: SFML 3 uses openFromFile for fonts!
+        std::cerr << "Failed to load font!!" << std::endl;
+        return -1;
+    }
+
+    sf::Text gameOverText(font);
+    gameOverText.setCharacterSize(70);
+    gameOverText.setStyle(sf::Text::Bold);
 
     // shapes, for making 8x8 grid or the Game Board
     sf::RectangleShape square(sf::Vector2f(100.f, 100.f));
@@ -29,6 +38,7 @@ int main()
     int selectedCol = -1;
     int clickState = 0;
     int sourceRow = -1, sourceCol = -1;
+    bool gameOver = false;
 
     // Objects
     PieceColor currentTurn = PieceColor::White;
@@ -45,7 +55,7 @@ int main()
             // mouse button press detection.
             if (event->is<sf::Event::MouseButtonPressed>())
             {
-                if (auto mouseEvent = event->getIf<sf::Event::MouseButtonPressed>()) 
+                if (auto mouseEvent = event->getIf<sf::Event::MouseButtonPressed>())
                 {
                     if (mouseEvent->button == sf::Mouse::Button::Left) // detect left click.
                     {
@@ -63,8 +73,11 @@ int main()
                             // State checking.
                             if (clickState == 0)
                             {
+                                if (gameOver)
+                                    continue;
+
                                 // STATE 0: Trying to pick up a piece
-                                Piece* clickedPiece = board.getPiece(row, col);
+                                Piece *clickedPiece = board.getPiece(row, col);
 
                                 if (clickedPiece != nullptr && clickedPiece->getColor() == currentTurn)
                                 {
@@ -82,9 +95,35 @@ int main()
                                 bool moveSuccessful = board.movePiece(sourceRow, sourceCol, row, col);
 
                                 // Only change the turn if the move was actually legal and successful
-                                if (moveSuccessful) {
+                                if (moveSuccessful)
+                                {
                                     currentTurn = (currentTurn == PieceColor::White) ? PieceColor::Black : PieceColor::White;
-                                    std::cout << "Move successful. Turn changed." << std::endl;
+                                    // --- PHASE 7 ENDGAME CHECK ---
+                                    if (!board.hasLegalMoves(currentTurn)) {
+                                        gameOver = true;
+                                        
+                                        if (board.isKingInCheck(currentTurn)) {
+                                            // CHECKMATE
+                                            std::string winner = (currentTurn == PieceColor::White) ? "Black" : "White";
+                                            gameOverText.setString("CHECKMATE!\n" + winner + " Wins!");
+                                            gameOverText.setFillColor(sf::Color(255, 50, 50)); // Red
+                                        } else {
+                                            // STALEMATE
+                                            gameOverText.setString("STALEMATE!\nIt's a draw!");
+                                            gameOverText.setFillColor(sf::Color(255, 215, 0)); // Yellow
+                                        }
+
+                                        // Center the text precisely on our 900x900 window
+                                        sf::FloatRect textRect = gameOverText.getLocalBounds();
+                                        gameOverText.setOrigin({textRect.position.x + textRect.size.x / 2.0f,
+                                                                textRect.position.y + textRect.size.y / 2.0f});
+                                        gameOverText.setPosition({450.f, 450.f});
+                                        
+                                    } else if (board.isKingInCheck(currentTurn)) {
+                                        std::cout << "\n* CHECK! *\n" << std::endl;
+                                    }
+                                } else {
+                                    std::cout << "Illegal move attempted!" << std::endl;
                                 }
 
                                 // Reset everything back to State 0
@@ -121,6 +160,20 @@ int main()
         // display the board status.
         board.drawBoard(window, selectedCol, selectedRow);
 
+        // display the board status.
+        board.drawBoard(window, selectedCol, selectedRow);
+
+        // --- NEW: Draw Game Over UI ---
+        if (gameOver) {
+            // Darken the board
+            sf::RectangleShape overlay(sf::Vector2f(900.f, 900.f));
+            overlay.setFillColor(sf::Color(0, 0, 0, 180)); // 180 is the transparency (alpha)
+            window.draw(overlay);
+            
+            // Draw the text
+            window.draw(gameOverText);
+        }
+        
         window.display(); // start displaying.
     }
 }

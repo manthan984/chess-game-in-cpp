@@ -22,6 +22,8 @@ protected:
 
     sf::Sprite sprite;
 
+    bool hasMoved = false;
+
     // Helper functions for move validation
     bool checkStraightLine(int startRow, int startCol, int endRow, int endCol, Piece* grid[8][8]);
     bool checkDiagonalLine(int startRow, int startCol, int endRow, int endCol, Piece* grid[8][8]);
@@ -34,6 +36,9 @@ public:
 
     PieceColor getColor() const;
     PieceType getType() const;
+
+    bool getHasMoved() const;
+    void setHasMoved(bool moved);
     
     sf::Sprite& getSprite();
 };

@@ -18,6 +18,10 @@ private:
 
     int whiteKingRow, whiteKingCol;
     int blackKingRow, blackKingCol;
+
+    sf::Clock blinkClock;
+    int blinkCounter = 0;
+    PieceColor blinkingKingColor;
 public:
     // Constructor/ Distructor
     Board(sf::RenderWindow &window, sf::RectangleShape &square, const float tileSize, const float borderOffset, const sf::Texture &texture);
@@ -26,8 +30,14 @@ public:
     // Methods-
     void drawTile(sf::RenderWindow &Window, float x, const float y, const sf::Color &color, int tempCol, int tempRow, int selectedCol, int selectedRow);
     void drawBoard(sf::RenderWindow &Window, int selectedCol, int selectedRow);
-    Piece *getPiece(int row, int col);
-    bool movePiece(int startRow, int startCol, int endRow, int endCol);
+    void triggerKingBlink(PieceColor color);
 
+    Piece *getPiece(int row, int col);
+    
+    bool movePiece(int startRow, int startCol, int endRow, int endCol);
     bool isSquareUnderAttack(int targetRow, int targetCol, PieceColor defebderColor);
+    bool isKingInCheck(PieceColor color);
+    bool isMoveLegal(int startRow, int startCol, int endRow, int endCol);
+    bool hasLegalMoves(PieceColor color);
+
 };

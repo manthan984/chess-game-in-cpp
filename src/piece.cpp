@@ -52,3 +52,11 @@ bool Piece::checkDiagonalLine(int startRow, int startCol, int endRow, int endCol
     }
     return true;
 }
+
+bool Piece::getHasMoved() const {
+    return hasMoved;
+}
+
+void Piece::setHasMoved(bool moved) {
+    hasMoved = moved;
+}

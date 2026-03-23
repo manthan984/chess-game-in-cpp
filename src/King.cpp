@@ -23,14 +23,37 @@ bool King::isValidMove(int startRow, int startCol, int endRow, int endCol, Piece
     int rowDiff = endRow - startRow;
     int colDiff = endCol - startCol;
 
-    // Only one step.
+    // --- CASTLING PHYSICS ---
+    if (rowDiff == 0 && std::abs(colDiff) == 2) {
+        if (this->hasMoved) return false; // Cannot castle if King has moved
+
+        // Kingside Castling (e8 to g8 -> col 4 to 6)
+        if (endCol == 6) {
+            // Check if path is empty
+            if (grid[startRow][5] != nullptr || grid[startRow][6] != nullptr) return false;
+            // Check if the Rook is there and hasn't moved
+            Piece* rook = grid[startRow][7];
+            if (rook == nullptr || rook->getType() != PieceType::Rook || rook->getHasMoved()) return false;
+            return true;
+        }
+        
+        // Queenside Castling (e8 to c8 -> col 4 to 2)
+        if (endCol == 2) {
+            // Check if path is empty (needs 3 empty squares on Queenside!)
+            if (grid[startRow][3] != nullptr || grid[startRow][2] != nullptr || grid[startRow][1] != nullptr) return false;
+            // Check if the Rook is there and hasn't moved
+            Piece* rook = grid[startRow][0];
+            if (rook == nullptr || rook->getType() != PieceType::Rook || rook->getHasMoved()) return false;
+            return true;
+        }
+    }
+
+    // --- NORMAL KING PHYSICS ---
     if (std::abs(rowDiff) > 1 || std::abs(colDiff) > 1) return false;
 
-    // Own piece check
     if (grid[endRow][endCol] != nullptr){
         if (grid[endRow][endCol]->getColor() == this->color) return false;
     }
 
-    // else valid move (for now I am not thinking about the checking squares).
     return true;
 }
