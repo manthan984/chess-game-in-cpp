@@ -1,28 +1,44 @@
-# Algorithmic Chess Engine with SFML Rendering
+# Algorithmic Chess Engine ♟️
 
-An object-oriented C++ chess simulator featuring in-memory move validation, state-machine mechanics, and hardware-accelerated rendering. This is not a "dumb board"; it is a self-aware engine that enforces strict physical rules, calculates polymorphic piece physics, and actively prevents illegal memory states.
+![C++](https://img.shields.io/badge/C++14-00599C?style=for-the-badge&logo=c%2B%2B&logoColor=white)
+![SFML](https://img.shields.io/badge/SFML_3.0-8CC445?style=for-the-badge&logo=c%2B%2B&logoColor=white)
+![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)
 
-![Chess Engine Demo](image_placeholder.png) ## Core Architecture
+A high-performance, object-oriented chess simulator built in C++. Unlike traditional procedural implementations, this engine functions as a self-aware state machine. It utilizes SFML for hardware-accelerated 2D rendering, decoupling the graphical frontend from the rigorous mathematical backend. 
 
-* **Memory Management:** Utilizes a dynamic 2D pointer array (`Piece* grid[8][8]`) to represent the board state. Memory is strictly managed using `new` and `delete` during piece instantiation and capture to prevent heap overflow and memory leaks during prolonged execution.
-* **Polymorphic Dispatch:** Inherits concrete piece logic (`King`, `Knight`, `Pawn`, etc.) from an abstract `Piece` base class. The central board manager uses dynamic binding (`grid[startRow][startCol]->isValidMove(...)`) to calculate physics without rigid, hardcoded type checking.
-* **The Simulation Radar:** Before committing a move, the engine temporarily alters pointer states, runs an $O(N^2)$ threat scan across the grid to detect absolute pins or checks, and safely rolls back the memory if the King is mathematically endangered.
-* **Endgame Evaluation:** Implements brute-force algorithmic scanning to detect Checkmate and Stalemate conditions when zero legally viable moves remain for the active player.
+The engine actively enforces physical chess rules, calculates polymorphic piece constraints, and executes in-memory move simulations to prevent illegal board states.
 
-## System Modules
+> **Note:** Insert a high-res GIF or screenshot of your gameplay here.
+> `![Gameplay Demo](docs/assets/demo.gif)`
 
-* **Model-View-Controller (MVC):** Achieves strict Separation of Concerns (SoC). The GUI rendering loop (View) is completely isolated from the backend mathematical pointer logic (Model).
-* **Finite State Machine (FSM):** Hardware interrupts are controlled via a strict 2-state flow (State 0: Piece Selection $\rightarrow$ State 1: Target Resolution) to prevent buggy interactions and invalid memory access.
+---
 
-## Dependencies (Linux)
+## 🔥 Core Engine Features
 
-* `g++` (Compiler with C++14 or higher standard support)
-* SFML 3.0.1+ (`sfml-graphics`, `sfml-window`, `sfml-system`)
+* **Algorithmic Move Simulation:** Implements a real-time "Radar" system. Before committing a move, the engine temporarily alters pointer states and runs an $O(N^2)$ threat scan across the grid to detect absolute pins. If the King is mathematically endangered, the memory is instantly rolled back.
+* **Polymorphic Dispatch:** The central board manager uses dynamic binding (`grid[row][col]->isValidMove()`) to route physics calculations to concrete piece classes (`Knight`, `Queen`, etc.) without rigid, hardcoded type checking.
+* **Strict Memory Management:** Utilizes a dynamic 2D pointer array. Piece capture and promotion triggers strict heap reallocation (`delete` and `new`) to prevent memory leaks during prolonged execution.
+* **Automated Endgame Evaluation:** Brute-force algorithmic scanning detects Checkmate and Stalemate conditions when zero legally viable moves remain for the active player.
+* **Advanced Mechanics:** Full support for Castling (with transit-square validation) and Pawn Promotion.
 
-## Build & Execute Instructions
+---
 
-**1. Install SFML via Package Manager**
-For Debian/Ubuntu/Mint/Pop!_OS:
+## 🏗️ System Architecture
+
+The architecture relies on a modified **Model-View-Controller (MVC)** pattern combined with a strict **Finite State Machine (FSM)**:
+1. **Model:** The `Board` class and `Piece` hierarchy hold the definitive 8x8 memory state. Completely blind to the UI.
+2. **View:** The SFML rendering loop operates at 60 FPS, translating 2D mathematical array indices into pixel coordinates.
+3. **Controller:** Handles hardware interrupts (mouse clicks) via a 2-step FSM (State 0: Selection $\rightarrow$ State 1: Resolution) to prevent invalid memory access.
+
+---
+
+## ⚙️ Build and Execution (Linux)
+
+This engine is designed to be compiled natively on Linux using `g++`. 
+
+### 1. Install Dependencies (SFML)
+Ensure you have the SFML development libraries installed.
+
+**For Arch / CachyOS:**
 ```bash
-sudo apt update
-sudo apt install libsfml-dev
+sudo pacman -S sfml
