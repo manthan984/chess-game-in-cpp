@@ -8,7 +8,7 @@ A high-performance, object-oriented chess simulator built in C++. Unlike traditi
 
 The engine actively enforces physical chess rules, calculates polymorphic piece constraints, and executes in-memory move simulations to prevent illegal board states.
 
-> ![Gameplay Demo](docs/assets/demo.png)
+> ![Gameplay Demo](/assets/demo.png)
 
 ---
 
